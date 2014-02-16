@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2013-12-28T16:01:45
+# Project created by QtCreator 2014-01-31T12:05:09
 #
 #-------------------------------------------------
 
@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = TrainCascade
+TARGET = FaceDetection_v2
 TEMPLATE = app
 
 
@@ -36,5 +36,3 @@ LIBS += -LC:\\opencvmybuild\\lib \
  -llibopencv_objdetect244 \
  -llibopencv_photo244 \
  -llibopencv_stitching244 \
- -llibopencv_video244 \
- -llibopencv_videostab244
