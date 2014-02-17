@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>766</width>
-    <height>482</height>
+    <width>965</width>
+    <height>672</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -63,16 +63,16 @@
      </rect>
     </property>
     <property name="text">
-     <string/>
+     <string>Source Video Frame</string>
     </property>
    </widget>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
       <x>400</x>
-      <y>40</y>
-      <width>161</width>
-      <height>151</height>
+      <y>50</y>
+      <width>291</width>
+      <height>81</height>
      </rect>
     </property>
     <property name="title">
@@ -94,8 +94,8 @@
     <widget class="QCheckBox" name="checkBox_eyes">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>70</y>
+       <x>110</x>
+       <y>40</y>
        <width>81</width>
        <height>21</height>
       </rect>
@@ -107,8 +107,8 @@
     <widget class="QCheckBox" name="checkBox_mouth">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>100</y>
+       <x>200</x>
+       <y>40</y>
        <width>91</width>
        <height>21</height>
       </rect>
@@ -131,17 +131,43 @@
      <string>Process Frame</string>
     </property>
    </widget>
-   <widget class="QLabel" name="lblProcessFrame">
+   <widget class="QLabel" name="lblProcessFaceFrame">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>220</y>
+      <x>400</x>
+      <y>140</y>
       <width>231</width>
       <height>171</height>
      </rect>
     </property>
     <property name="text">
-     <string/>
+     <string>Face Frame</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblProcessEyeFrame">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>340</y>
+      <width>241</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Eye Frame</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblProcessMouthFrame">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>430</y>
+      <width>251</width>
+      <height>141</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>MouthFrame</string>
     </property>
    </widget>
   </widget>
@@ -150,7 +176,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>766</width>
+     <width>965</width>
      <height>21</height>
     </rect>
    </property>

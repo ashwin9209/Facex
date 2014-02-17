@@ -72,7 +72,7 @@ void MainWindow::on_actionStart_clicked()
 void MainWindow::on_btnProcessFrame_clicked()
 {
     //StartProcessingEventId = startTimer(50);
-    //ExtractAndDisplayROI();
+    //ExtractAndDisplayFaceROI();
 }
 
 void MainWindow::on_actionLoadVideo_clicked()
@@ -137,25 +137,29 @@ void MainWindow::timerEvent(QTimerEvent *event)
                 for( size_t i = 0; i < faceVec.size(); i++ )
                 {
                     cv::rectangle( mElabImage, faceVec[i], CV_RGB(255,0,0), 2 );
-
                     cv::Mat face = mOrigImage( faceVec[i] );
 
-                    ExtractAndDisplayROI(mElabImage); //Crop out ROI of Face detected.
+
+                    //Crop out ROI of Face detected.
+                    ExtractAndDisplayFaceROI(mOrigImage);
+
 
                     // ---> Eye Detection
                     if( ui->checkBox_eyes->isChecked() )
                     {
-                        vector< cv::Rect > eyeVec;
-
+                        //vector< cv::Rect > eyeVec;
                         mEyeDetector.detectMultiScale( face, eyeVec );
 
                         for( size_t j=0; j<eyeVec.size(); j++ )
                         {
-                            cv::Rect rect = eyeVec[j];
+                            rect = eyeVec[j];
                             rect.x += faceVec[i].x;
                             rect.y += faceVec[i].y;
 
                             cv::rectangle( mElabImage, rect, CV_RGB(0,255,0), 2 );
+
+                            //Crop out ROI of eyes detected
+                            ExtractAndDisplayEyeROI(mElabImage, rect);
                         }
                     }
                     // <--- Eye Detection
@@ -164,7 +168,7 @@ void MainWindow::timerEvent(QTimerEvent *event)
                     // [Searched in the bottom half face]
                     if( ui->checkBox_mouth->isChecked() )
                     {
-                        vector< cv::Rect > mouthVec;
+                        //vector< cv::Rect > mouthVec;
                         cv::Rect halfRect = faceVec[i];
                         halfRect.height /= 2;
                         halfRect.y += halfRect.height;
@@ -180,6 +184,10 @@ void MainWindow::timerEvent(QTimerEvent *event)
                             rect.y += halfRect.y;
 
                             cv::rectangle( mElabImage, rect, CV_RGB(255,255,255), 2 );
+
+
+                            //Crop out ROI of mouth detected
+                            ExtractAndDisplayMouthROI(mElabImage, rect);
                         }
                     }
                     // <--- Mouth Detection
@@ -199,22 +207,9 @@ void MainWindow::timerEvent(QTimerEvent *event)
 
 }
 
-void MainWindow::on_checkBox_fullFace_clicked()
-{
-    if( ui->checkBox_fullFace->isChecked() )
-        {
-            ui->checkBox_eyes->setEnabled( true );
-            ui->checkBox_mouth->setEnabled( true );
-        }
-        else
-        {
-            ui->checkBox_eyes->setEnabled( false );
-            ui->checkBox_mouth->setEnabled( false );
-        }
-}
 
 
-void MainWindow::ExtractAndDisplayROI(cv::Mat mElabImagefromTracking)
+void MainWindow::ExtractAndDisplayFaceROI(cv::Mat mElabImagefromTracking)
 {
         //killTimer(StartProcessingEventId);
 
@@ -239,8 +234,103 @@ void MainWindow::ExtractAndDisplayROI(cv::Mat mElabImagefromTracking)
         QImage qSegmentedImage ((uchar*) mProcImage.data, mProcImage.cols, mProcImage.rows,
                                      mProcImage.step, QImage::Format_RGB888);
 
-        ui->lblProcessFrame->setPixmap(QPixmap::fromImage(qSegmentedImage));
+        ui->lblProcessFaceFrame->setPixmap(QPixmap::fromImage(qSegmentedImage));
 
         // Timer reactivation
         //StartProcessingEventId = startTimer( 0 );
     }
+
+
+
+
+
+void MainWindow::ExtractAndDisplayEyeROI(cv::Mat mElabImagefromTracking, cv::Rect prect)
+{
+    //killTimer(StartProcessingEventId);
+
+    IplImage *iplimageFrameSource = new IplImage(mElabImagefromTracking);
+    //IplImage *iplimageFrameDest;
+
+    //cvCopy(iplimageFrameSource, iplimageFrameDest, NULL);
+    cv::Rect roi_eye;
+
+    for(size_t i = 0; i < eyeVec.size();i++)
+    {
+        /*roi_eye.x = eyeVec[i].x;
+        roi_eye.y = eyeVec[i].y;
+        roi_eye.width = (eyeVec[i].width);
+        roi_eye.height = (eyeVec[i].height);*/
+
+        roi_eye.x = prect.x;
+        roi_eye.y = prect.y;
+        roi_eye.width = prect.width;
+        roi_eye.height = prect.height;
+    }
+
+    cvSetImageROI(iplimageFrameSource, roi_eye);
+
+    cv::Mat mProcImage(iplimageFrameSource);
+    cv::cvtColor(mProcImage, mProcImage, CV_BGR2RGB);
+    QImage qSegmentedImage ((uchar*) mProcImage.data, mProcImage.cols, mProcImage.rows,
+                                 mProcImage.step, QImage::Format_RGB888);
+
+    ui->lblProcessEyeFrame->setPixmap(QPixmap::fromImage(qSegmentedImage));
+
+    // Timer reactivation
+    //StartProcessingEventId = startTimer( 0 );
+}
+
+
+
+
+
+void MainWindow::ExtractAndDisplayMouthROI(cv::Mat mElabImagefromTracking, cv::Rect prect)
+{
+    //killTimer(StartProcessingEventId);
+
+    IplImage *iplimageFrameSource = new IplImage(mElabImagefromTracking);
+    //IplImage *iplimageFrameDest;
+
+    //cvCopy(iplimageFrameSource, iplimageFrameDest, NULL);
+    cv::Rect roi_mouth;
+
+    for(size_t i = 0; i < mouthVec.size();i++)
+    {
+        /*roi_mouth.x = mouthVec[i].x;
+        roi_mouth.y = mouthVec[i].y;
+        roi_mouth.width = (mouthVec[i].width);
+        roi_mouth.height = (mouthVec[i].height);*/
+
+        roi_mouth.x = prect.x;
+        roi_mouth.y = prect.y;
+        roi_mouth.width = prect.width;
+        roi_mouth.height = prect.height;
+    }
+
+    cvSetImageROI(iplimageFrameSource, roi_mouth);
+
+    cv::Mat mProcImage(iplimageFrameSource);
+    cv::cvtColor(mProcImage, mProcImage, CV_BGR2RGB);
+    QImage qSegmentedImage ((uchar*) mProcImage.data, mProcImage.cols, mProcImage.rows,
+                                 mProcImage.step, QImage::Format_RGB888);
+
+    ui->lblProcessMouthFrame->setPixmap(QPixmap::fromImage(qSegmentedImage));
+
+    // Timer reactivation
+    //StartProcessingEventId = startTimer( 0 );
+}
+
+void MainWindow::on_checkBox_fullFace_clicked()
+{
+    if( ui->checkBox_fullFace->isChecked() )
+        {
+            ui->checkBox_eyes->setEnabled( true );
+            ui->checkBox_mouth->setEnabled( true );
+        }
+        else
+        {
+            ui->checkBox_eyes->setEnabled( false );
+            ui->checkBox_mouth->setEnabled( false );
+        }
+}
+

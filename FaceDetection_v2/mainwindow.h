@@ -28,7 +28,9 @@ private slots:
     void on_actionStop_clicked();
     void on_actionLoadVideo_clicked();
     void on_btnProcessFrame_clicked();
-    void ExtractAndDisplayROI(cv::Mat);
+    void ExtractAndDisplayFaceROI(cv::Mat);
+    void ExtractAndDisplayEyeROI(cv::Mat, cv::Rect);
+    void ExtractAndDisplayMouthROI(cv::Mat, cv::Rect);
 
 private:
     Ui::MainWindow *ui;
@@ -41,7 +43,11 @@ private:
     cv::VideoCapture mCapture;
     cv::VideoCapture mVideo;
 
-    std::vector< cv::Rect > faceVec;
+    cv::Rect rect;
+
+    std::vector< cv:: Rect > faceVec;
+    std::vector< cv:: Rect > eyeVec;
+    std::vector< cv::Rect > mouthVec;
 
     int videoStatus;
 
