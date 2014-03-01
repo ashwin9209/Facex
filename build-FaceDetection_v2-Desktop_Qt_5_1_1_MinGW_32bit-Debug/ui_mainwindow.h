@@ -30,15 +30,12 @@ class Ui_MainWindow
 {
 public:
     QWidget *centralWidget;
-    QPushButton *actionStart;
-    QPushButton *actionStop;
     QPushButton *actionLoadVideo;
     QLabel *lblVideo;
     QGroupBox *groupBox;
     QCheckBox *checkBox_fullFace;
     QCheckBox *checkBox_eyes;
     QCheckBox *checkBox_mouth;
-    QPushButton *btnProcessFrame;
     QLabel *lblProcessFaceFrame;
     QLabel *lblProcessEyeFrame;
     QLabel *lblProcessMouthFrame;
@@ -53,12 +50,6 @@ public:
         MainWindow->resize(965, 672);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
-        actionStart = new QPushButton(centralWidget);
-        actionStart->setObjectName(QStringLiteral("actionStart"));
-        actionStart->setGeometry(QRect(0, 0, 75, 23));
-        actionStop = new QPushButton(centralWidget);
-        actionStop->setObjectName(QStringLiteral("actionStop"));
-        actionStop->setGeometry(QRect(70, 0, 75, 23));
         actionLoadVideo = new QPushButton(centralWidget);
         actionLoadVideo->setObjectName(QStringLiteral("actionLoadVideo"));
         actionLoadVideo->setGeometry(QRect(140, 0, 75, 23));
@@ -77,9 +68,6 @@ public:
         checkBox_mouth = new QCheckBox(groupBox);
         checkBox_mouth->setObjectName(QStringLiteral("checkBox_mouth"));
         checkBox_mouth->setGeometry(QRect(200, 40, 91, 21));
-        btnProcessFrame = new QPushButton(centralWidget);
-        btnProcessFrame->setObjectName(QStringLiteral("btnProcessFrame"));
-        btnProcessFrame->setGeometry(QRect(210, 0, 91, 23));
         lblProcessFaceFrame = new QLabel(centralWidget);
         lblProcessFaceFrame->setObjectName(QStringLiteral("lblProcessFaceFrame"));
         lblProcessFaceFrame->setGeometry(QRect(400, 140, 231, 171));
@@ -109,15 +97,12 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
-        actionStart->setText(QApplication::translate("MainWindow", "Start Camera", 0));
-        actionStop->setText(QApplication::translate("MainWindow", "Stop Camera", 0));
         actionLoadVideo->setText(QApplication::translate("MainWindow", "Open File...", 0));
         lblVideo->setText(QApplication::translate("MainWindow", "Source Video Frame", 0));
         groupBox->setTitle(QApplication::translate("MainWindow", "Options", 0));
         checkBox_fullFace->setText(QApplication::translate("MainWindow", "Detect Face", 0));
         checkBox_eyes->setText(QApplication::translate("MainWindow", "Detect Eyes", 0));
         checkBox_mouth->setText(QApplication::translate("MainWindow", "Detect Mouth", 0));
-        btnProcessFrame->setText(QApplication::translate("MainWindow", "Process Frame", 0));
         lblProcessFaceFrame->setText(QApplication::translate("MainWindow", "Face Frame", 0));
         lblProcessEyeFrame->setText(QApplication::translate("MainWindow", "Eye Frame", 0));
         lblProcessMouthFrame->setText(QApplication::translate("MainWindow", "MouthFrame", 0));

@@ -23,10 +23,15 @@ protected:
 
 private slots:
 
+    void createQtGUIActions();
+    void createQtGUIMenus();
+
+
     void on_checkBox_fullFace_clicked();
     void on_actionStart_clicked();
     void on_actionStop_clicked();
     void on_actionLoadVideo_clicked();
+    void on_action_AboutFacex_clicked();
     void on_btnProcessFrame_clicked();
     void ExtractAndDisplayFaceROI(cv::Mat);
     void ExtractAndDisplayEyeROI(cv::Mat, cv::Rect);
@@ -34,6 +39,11 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+
+    QMenu *fileMenu;
+    QAction *startCameraAction;
+    QAction *stopCameraAction;
+    QAction *aboutFacex;
 
     int StartVideoEventId;
 

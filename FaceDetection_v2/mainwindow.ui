@@ -14,32 +14,6 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="actionStart">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Start Camera</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="actionStop">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>0</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Stop Camera</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="actionLoadVideo">
     <property name="geometry">
      <rect>
@@ -117,19 +91,6 @@
       <string>Detect Mouth</string>
      </property>
     </widget>
-   </widget>
-   <widget class="QPushButton" name="btnProcessFrame">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>0</y>
-      <width>91</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Process Frame</string>
-    </property>
    </widget>
    <widget class="QLabel" name="lblProcessFaceFrame">
     <property name="geometry">

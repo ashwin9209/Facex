@@ -5,6 +5,8 @@
 #include <QDebug>
 #include<opencv2/imgproc/imgproc.hpp>
 #include<QFileDialog>
+#include<QMenu>
+#include<QMessageBox>
 
 #define FACE_XML  "frontalFace.xml"
 #define EYE_XML   "haarcascade_mcs_eyepair_big.xml"
@@ -15,20 +17,23 @@
 
 using namespace std;
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     ui->checkBox_eyes->setEnabled( false ); /*should not enable detection of eyes before face detection*/
     ui->checkBox_mouth->setEnabled( false ); /*should not enable detection of mouth before face detection*/
     ui->actionLoadVideo->setEnabled( false );
 
+
+    createQtGUIActions();
+    createQtGUIMenus();
+
+
     QString file;
 
         if( mFaceDetector.empty() )
         {
-            /* Trained XML classifiers should be available in the build directory*/
+            /* Trained XML classifiers should be available in the build directory */
 
             file = tr("%1/%2").arg(QApplication::applicationDirPath()).arg(FACE_XML);
             if(!mFaceDetector.load( file.toLatin1().constData() ))
@@ -55,6 +60,28 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::createQtGUIActions()
+{
+    startCameraAction = new QAction(tr("&Start Camera"), this);
+    startCameraAction->setStatusTip(tr("Starts the web-camera to enable tracking"));
+    connect(startCameraAction, SIGNAL(triggered()), this, SLOT(on_actionStart_clicked()));
+
+    stopCameraAction = new QAction(tr("&Stop Camera"), this);
+    stopCameraAction->setStatusTip(tr("Stops the web-camera and disables tracking"));
+    connect(stopCameraAction, SIGNAL(triggered()), this, SLOT(on_actionStop_clicked()));
+
+    aboutFacex = new QAction(tr("&About"), this);
+    connect(aboutFacex, SIGNAL(triggered()), this, SLOT(on_action_AboutFacex_clicked()));
+}
+
+void MainWindow::createQtGUIMenus()
+{
+    fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu->addAction(startCameraAction);
+    fileMenu->addAction(stopCameraAction);
+    fileMenu->addAction(aboutFacex);
+
+}
 
 void MainWindow::on_actionStart_clicked()
 {
@@ -63,7 +90,7 @@ void MainWindow::on_actionStart_clicked()
             mCapture.open(0);
             videoStatus = CAMERA; /* Set the appropriate stream */
             /*ui->actionLoadVideo->setEnabled( false );*/ /* Disable the File Explorer for loading videos*/
-            ui->actionStart->setEnabled( false );
+            //ui->actionStart->setEnabled( false );
             StartVideoEventId = startTimer( 50 );
         }
 }
@@ -110,6 +137,18 @@ void MainWindow::on_actionStop_clicked()
     mCapture.release();
 }
 
+void MainWindow::on_action_AboutFacex_clicked()
+{
+    QMessageBox::about(this, tr("About Facex"),
+                tr("<h2>Facex 1.0</h2>"
+                   "<p>Copyright &copy; 2014 Software Inc."
+                   "<p>Facex is a real-time image processing application "
+                   "that processes human facial expressions through a "
+                   "live webcam stream and classifies them into various "
+                   "emotion categories."));
+
+}
+
 void MainWindow::timerEvent(QTimerEvent *event)
 {
 
@@ -144,6 +183,8 @@ void MainWindow::timerEvent(QTimerEvent *event)
                     ExtractAndDisplayFaceROI(mOrigImage);
 
 
+
+
                     // ---> Eye Detection
                     if( ui->checkBox_eyes->isChecked() )
                     {
@@ -164,7 +205,10 @@ void MainWindow::timerEvent(QTimerEvent *event)
                     }
                     // <--- Eye Detection
 
+
+
                     // ---> Mouth Detection
+
                     // [Searched in the bottom half face]
                     if( ui->checkBox_mouth->isChecked() )
                     {
@@ -333,4 +377,3 @@ void MainWindow::on_checkBox_fullFace_clicked()
             ui->checkBox_mouth->setEnabled( false );
         }
 }
-
