@@ -3,10 +3,11 @@
 #include <stdlib.h>
 #include <vector>
 #include <QDebug>
-#include<opencv2/imgproc/imgproc.hpp>
-#include<QFileDialog>
-#include<QMenu>
-#include<QMessageBox>
+#include <QFileDialog>
+#include <QMenu>
+#include <QMessageBox>
+#include <opencv2/imgproc/imgproc.hpp>
+
 
 #define FACE_XML  "frontalFace.xml"
 #define EYE_XML   "haarcascade_mcs_eyepair_big.xml"
@@ -22,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     ui->setupUi(this);
     ui->checkBox_eyes->setEnabled( false ); /*should not enable detection of eyes before face detection*/
     ui->checkBox_mouth->setEnabled( false ); /*should not enable detection of mouth before face detection*/
-    ui->actionLoadVideo->setEnabled( false );
+    //ui->actionLoadVideo->setEnabled( false );
 
 
     createQtGUIActions();
@@ -31,26 +32,26 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
 
     QString file;
 
-        if( mFaceDetector.empty() )
+        if( HaarFaceClassifier.empty() )
         {
             /* Trained XML classifiers should be available in the build directory */
 
             file = tr("%1/%2").arg(QApplication::applicationDirPath()).arg(FACE_XML);
-            if(!mFaceDetector.load( file.toLatin1().constData() ))
+            if(!HaarFaceClassifier.load( file.toLatin1().constData() ))
                 qDebug() << tr("Cannot find %1").arg(file);
         }
 
-        if( mEyeDetector.empty() )
+        if( HaarEyeClassifier.empty() )
         {
             file = tr("%1/%2").arg(QApplication::applicationDirPath()).arg(EYE_XML);
-            if(!mEyeDetector.load( file.toLatin1().constData() ))
+            if(!HaarEyeClassifier.load( file.toLatin1().constData() ))
                 qDebug() << tr("Cannot find %1").arg(file);
         }
 
-        if( mMouthDetector.empty() )
+        if( HaarMouthClassifier.empty() )
         {
             file = tr("%1/%2").arg(QApplication::applicationDirPath()).arg(MOUTH_XML);
-            if(!mMouthDetector.load( file.toLatin1().constData() ))
+            if(!HaarMouthClassifier.load( file.toLatin1().constData() ))
                 qDebug() << tr("Cannot find %1").arg(file);
         }
 }
@@ -85,9 +86,9 @@ void MainWindow::createQtGUIMenus()
 
 void MainWindow::on_actionStart_clicked()
 {
-        if( !mCapture.isOpened() )
+        if( !WebCamCaptureDevice.isOpened() )
         {
-            mCapture.open(0);
+            WebCamCaptureDevice.open(0);
             videoStatus = CAMERA; /* Set the appropriate stream */
             /*ui->actionLoadVideo->setEnabled( false );*/ /* Disable the File Explorer for loading videos*/
             //ui->actionStart->setEnabled( false );
@@ -95,17 +96,10 @@ void MainWindow::on_actionStart_clicked()
         }
 }
 
-
-void MainWindow::on_btnProcessFrame_clicked()
-{
-    //StartProcessingEventId = startTimer(50);
-    //ExtractAndDisplayFaceROI();
-}
-
 void MainWindow::on_actionLoadVideo_clicked()
 {
-    QString fileName;
-    fileName = QFileDialog::getOpenFileName(this, tr("Load Video"), "D:/", tr("Video Files(*.avi, *.mp4)"));
+    /*QString fileName;
+    fileName = QFileDialog::getOpenFileName(this, tr("Load Video"), "D:/", tr("Video Files(*.avi, *.mp4)"));*/
 
     //CvCapture *videoFile = cvCaptureFromFile(fileName.toUtf8().constData());
 
@@ -134,7 +128,7 @@ void MainWindow::on_actionStop_clicked()
     /*ui->actionLoadVideo->setEnabled( true );
     ui->btnStopPro->setEnabled( true );*/
     killTimer( StartVideoEventId );
-    mCapture.release();
+    WebCamCaptureDevice.release();
 }
 
 void MainWindow::on_action_AboutFacex_clicked()
@@ -158,29 +152,29 @@ void MainWindow::timerEvent(QTimerEvent *event)
             killTimer( StartVideoEventId );
 
             if(videoStatus == CAMERA)
-                mCapture >> mOrigImage;
+                WebCamCaptureDevice >> MatOriginalImage;
 
             /*else if(videoStatus == VIDEO)
-                mVideo >> mOrigImage;*/
+                mVideo >> MatOriginalImage;*/
 
-            mOrigImage.copyTo( mElabImage );
+            MatOriginalImage.copyTo( MatProcessedImage );
 
             if( ui->checkBox_fullFace->isChecked() )
             {
-                //vector< cv::Rect > faceVec;
+                //vector< cv::Rect > faceBoundingVector;
 
                 float scaleFactor = 3.0f; // Change Scale Factor to change speed
-                mFaceDetector.detectMultiScale( mOrigImage, faceVec, scaleFactor );
-                //mFaceDetector.detectSingleScale() mOrigImage, rectVec );
+                HaarFaceClassifier.detectMultiScale( MatOriginalImage, faceBoundingVector, scaleFactor );
+                //HaarFaceClassifier.detectSingleScale() MatOriginalImage, rectVec );
 
-                for( size_t i = 0; i < faceVec.size(); i++ )
+                for( size_t i = 0; i < faceBoundingVector.size(); i++ )
                 {
-                    cv::rectangle( mElabImage, faceVec[i], CV_RGB(255,0,0), 2 );
-                    cv::Mat face = mOrigImage( faceVec[i] );
+                    cv::rectangle( MatProcessedImage, faceBoundingVector[i], CV_RGB(0,0,0), 2 );
+                    cv::Mat face = MatOriginalImage( faceBoundingVector[i] );
 
 
                     //Crop out ROI of Face detected.
-                    ExtractAndDisplayFaceROI(mOrigImage);
+                    ExtractAndDisplayFaceROI(MatOriginalImage);
 
 
 
@@ -188,19 +182,19 @@ void MainWindow::timerEvent(QTimerEvent *event)
                     // ---> Eye Detection
                     if( ui->checkBox_eyes->isChecked() )
                     {
-                        //vector< cv::Rect > eyeVec;
-                        mEyeDetector.detectMultiScale( face, eyeVec );
+                        //vector< cv::Rect > eyeBoundingVector;
+                        HaarEyeClassifier.detectMultiScale( face, eyeBoundingVector );
 
-                        for( size_t j=0; j<eyeVec.size(); j++ )
+                        for( size_t j=0; j<eyeBoundingVector.size(); j++ )
                         {
-                            rect = eyeVec[j];
-                            rect.x += faceVec[i].x;
-                            rect.y += faceVec[i].y;
+                            cv::Rect rect = eyeBoundingVector[j];
+                            rect.x += faceBoundingVector[i].x;
+                            rect.y += faceBoundingVector[i].y;
 
-                            cv::rectangle( mElabImage, rect, CV_RGB(0,255,0), 2 );
+                            cv::rectangle( MatProcessedImage, rect, CV_RGB(0,0,0), 2 );
 
                             //Crop out ROI of eyes detected
-                            ExtractAndDisplayEyeROI(mElabImage, rect);
+                            ExtractAndDisplayEyeROI(MatProcessedImage, rect);
                         }
                     }
                     // <--- Eye Detection
@@ -212,35 +206,35 @@ void MainWindow::timerEvent(QTimerEvent *event)
                     // [Searched in the bottom half face]
                     if( ui->checkBox_mouth->isChecked() )
                     {
-                        //vector< cv::Rect > mouthVec;
-                        cv::Rect halfRect = faceVec[i];
+                        //vector< cv::Rect > mouthBoundingVector;
+                        cv::Rect halfRect = faceBoundingVector[i];
                         halfRect.height /= 2;
                         halfRect.y += halfRect.height;
 
-                        cv::Mat halfFace = mOrigImage( halfRect );
+                        cv::Mat halfFace = MatOriginalImage( halfRect );
 
-                        mMouthDetector.detectMultiScale( halfFace, mouthVec, 3 );
+                        HaarMouthClassifier.detectMultiScale( halfFace, mouthBoundingVector, 3 );
 
-                        for( size_t j=0; j<mouthVec.size(); j++ )
+                        for( size_t j=0; j<mouthBoundingVector.size(); j++ )
                         {
-                            cv::Rect rect = mouthVec[j];
+                            cv::Rect rect = mouthBoundingVector[j];
                             rect.x += halfRect.x;
                             rect.y += halfRect.y;
 
-                            cv::rectangle( mElabImage, rect, CV_RGB(255,255,255), 2 );
+                            cv::rectangle( MatProcessedImage, rect, CV_RGB(0, 0, 0), 2 );
 
 
                             //Crop out ROI of mouth detected
-                            ExtractAndDisplayMouthROI(mElabImage, rect);
+                            ExtractAndDisplayMouthROI(MatProcessedImage, rect);
                         }
                     }
                     // <--- Mouth Detection
                 }
             }
 
-            cv::cvtColor(mElabImage, mElabImage, CV_BGR2RGB);
-            QImage qProcessedImage ((uchar*) mElabImage.data, mElabImage.cols, mElabImage.rows,
-                                     mElabImage.step, QImage::Format_RGB888);
+            cv::cvtColor(MatProcessedImage, MatProcessedImage, CV_BGR2RGB);
+            QImage qProcessedImage ((uchar*) MatProcessedImage.data, MatProcessedImage.cols, MatProcessedImage.rows,
+                                     MatProcessedImage.step, QImage::Format_RGB888);
 
             ui->lblVideo->setPixmap(QPixmap::fromImage(qProcessedImage));
 
@@ -253,22 +247,22 @@ void MainWindow::timerEvent(QTimerEvent *event)
 
 
 
-void MainWindow::ExtractAndDisplayFaceROI(cv::Mat mElabImagefromTracking)
+void MainWindow::ExtractAndDisplayFaceROI(cv::Mat MatProcessedImagefromTracking)
 {
         //killTimer(StartProcessingEventId);
 
-        IplImage *iplimageFrameSource = new IplImage(mElabImagefromTracking);
+        IplImage *iplimageFrameSource = new IplImage(MatProcessedImagefromTracking);
         //IplImage *iplimageFrameDest;
 
         //cvCopy(iplimageFrameSource, iplimageFrameDest, NULL);
         cv::Rect roi_face;
 
-        for(size_t i = 0; i < faceVec.size();i++)
+        for(size_t i = 0; i < faceBoundingVector.size();i++)
         {
-            roi_face.x = faceVec[i].x;
-            roi_face.y = faceVec[i].y;
-            roi_face.width = (faceVec[i].width);
-            roi_face.height = (faceVec[i].height);
+            roi_face.x = faceBoundingVector[i].x;
+            roi_face.y = faceBoundingVector[i].y;
+            roi_face.width = (faceBoundingVector[i].width);
+            roi_face.height = (faceBoundingVector[i].height);
         }
 
         cvSetImageROI(iplimageFrameSource, roi_face);
@@ -288,22 +282,22 @@ void MainWindow::ExtractAndDisplayFaceROI(cv::Mat mElabImagefromTracking)
 
 
 
-void MainWindow::ExtractAndDisplayEyeROI(cv::Mat mElabImagefromTracking, cv::Rect prect)
+void MainWindow::ExtractAndDisplayEyeROI(cv::Mat MatProcessedImagefromTracking, cv::Rect prect)
 {
     //killTimer(StartProcessingEventId);
 
-    IplImage *iplimageFrameSource = new IplImage(mElabImagefromTracking);
+    IplImage *iplimageFrameSource = new IplImage(MatProcessedImagefromTracking);
     //IplImage *iplimageFrameDest;
 
     //cvCopy(iplimageFrameSource, iplimageFrameDest, NULL);
     cv::Rect roi_eye;
 
-    for(size_t i = 0; i < eyeVec.size();i++)
+    for(size_t i = 0; i < eyeBoundingVector.size();i++)
     {
-        /*roi_eye.x = eyeVec[i].x;
-        roi_eye.y = eyeVec[i].y;
-        roi_eye.width = (eyeVec[i].width);
-        roi_eye.height = (eyeVec[i].height);*/
+        /*roi_eye.x = eyeBoundingVector[i].x;
+        roi_eye.y = eyeBoundingVector[i].y;
+        roi_eye.width = (eyeBoundingVector[i].width);
+        roi_eye.height = (eyeBoundingVector[i].height);*/
 
         roi_eye.x = prect.x;
         roi_eye.y = prect.y;
@@ -328,22 +322,22 @@ void MainWindow::ExtractAndDisplayEyeROI(cv::Mat mElabImagefromTracking, cv::Rec
 
 
 
-void MainWindow::ExtractAndDisplayMouthROI(cv::Mat mElabImagefromTracking, cv::Rect prect)
+void MainWindow::ExtractAndDisplayMouthROI(cv::Mat MatProcessedImagefromTracking, cv::Rect prect)
 {
     //killTimer(StartProcessingEventId);
 
-    IplImage *iplimageFrameSource = new IplImage(mElabImagefromTracking);
+    IplImage *iplimageFrameSource = new IplImage(MatProcessedImagefromTracking);
     //IplImage *iplimageFrameDest;
 
     //cvCopy(iplimageFrameSource, iplimageFrameDest, NULL);
     cv::Rect roi_mouth;
 
-    for(size_t i = 0; i < mouthVec.size();i++)
+    for(size_t i = 0; i < mouthBoundingVector.size();i++)
     {
-        /*roi_mouth.x = mouthVec[i].x;
-        roi_mouth.y = mouthVec[i].y;
-        roi_mouth.width = (mouthVec[i].width);
-        roi_mouth.height = (mouthVec[i].height);*/
+        /*roi_mouth.x = mouthBoundingVector[i].x;
+        roi_mouth.y = mouthBoundingVector[i].y;
+        roi_mouth.width = (mouthBoundingVector[i].width);
+        roi_mouth.height = (mouthBoundingVector[i].height);*/
 
         roi_mouth.x = prect.x;
         roi_mouth.y = prect.y;

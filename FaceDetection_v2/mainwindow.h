@@ -28,11 +28,12 @@ private slots:
 
 
     void on_checkBox_fullFace_clicked();
-    void on_actionStart_clicked();
-    void on_actionStop_clicked();
-    void on_actionLoadVideo_clicked();
+    void on_actionStart_clicked();      //start webcam stream button action
+    void on_actionStop_clicked();       //stop webcam stream button action
+    void on_actionLoadVideo_clicked();  //load video from file explorer
     void on_action_AboutFacex_clicked();
-    void on_btnProcessFrame_clicked();
+
+    //segmenting out detected areas of the face
     void ExtractAndDisplayFaceROI(cv::Mat);
     void ExtractAndDisplayEyeROI(cv::Mat, cv::Rect);
     void ExtractAndDisplayMouthROI(cv::Mat, cv::Rect);
@@ -40,6 +41,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
+    //GUI dropdown menus and corresponding actions
     QMenu *fileMenu;
     QAction *startCameraAction;
     QAction *stopCameraAction;
@@ -47,24 +49,21 @@ private:
 
     int StartVideoEventId;
 
-    cv::Mat mOrigImage;
-    cv::Mat mElabImage;
+    cv::Mat MatOriginalImage;   //original image obtained from webcam
+    cv::Mat MatProcessedImage;  //processed image after applying algorithms, mainly Haar trained classifiers.
 
-    cv::VideoCapture mCapture;
-    cv::VideoCapture mVideo;
+    cv::VideoCapture WebCamCaptureDevice;  //Capture Device i.e. Webcam
 
-    cv::Rect rect;
+    std::vector< cv:: Rect > faceBoundingVector;    //Storing Bounding Vectors of detected face
+    std::vector< cv:: Rect > eyeBoundingVector;     //Storing Bounding Vectors of detected eyes
+    std::vector< cv::Rect > mouthBoundingVector;    //Storing Bounding Vectors of detected mouth
 
-    std::vector< cv:: Rect > faceVec;
-    std::vector< cv:: Rect > eyeVec;
-    std::vector< cv::Rect > mouthVec;
+    int videoStatus; //detecting whether the input stream is video or camera
 
-    int videoStatus;
-
-    // ---> Face detectors
-    cv::CascadeClassifier mFaceDetector;
-    cv::CascadeClassifier mEyeDetector;
-    cv::CascadeClassifier mMouthDetector;
+    // ---> Haar Face detectors
+    cv::CascadeClassifier HaarFaceClassifier;
+    cv::CascadeClassifier HaarEyeClassifier;
+    cv::CascadeClassifier HaarMouthClassifier;
     // <--- Face detectors
 };
 
