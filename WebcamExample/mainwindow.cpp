@@ -6,11 +6,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ImageIndex = 0;
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    WebCam.release();
 }
 
 void MainWindow::on_btnCameraStart_clicked()
@@ -41,6 +43,16 @@ void MainWindow::ProcessFrameandDisplay()
     QImage qimgOriginal((uchar*)matOriginal.data, matOriginal.cols, matOriginal.rows, matOriginal.step, QImage::Format_RGB888);
 
     ui->lblVideoSource->setPixmap(QPixmap::fromImage(qimgOriginal));
+
+    if(ui->checkBox_StartCapturing->isChecked())
+    {
+        ImageIndex++;
+        QString FileName = QString :: number (ImageIndex);
+        FileName = FileName + ".JPG";
+        if(qimgOriginal.save(FileName, 0, -1))
+            ui->lblError->setText("Saved file " + FileName);
+    }
+
 }
 
 void MainWindow::on_btnCameraStop_clicked()

@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
@@ -32,6 +33,7 @@ public:
     QPushButton *btnCameraStart;
     QLabel *lblError;
     QPushButton *btnCameraStop;
+    QCheckBox *checkBox_StartCapturing;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -40,7 +42,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(696, 550);
+        MainWindow->resize(849, 596);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         lblVideoSource = new QLabel(centralWidget);
@@ -48,17 +50,20 @@ public:
         lblVideoSource->setGeometry(QRect(150, 10, 401, 351));
         btnCameraStart = new QPushButton(centralWidget);
         btnCameraStart->setObjectName(QStringLiteral("btnCameraStart"));
-        btnCameraStart->setGeometry(QRect(80, 400, 161, 41));
+        btnCameraStart->setGeometry(QRect(140, 400, 161, 81));
         lblError = new QLabel(centralWidget);
         lblError->setObjectName(QStringLiteral("lblError"));
-        lblError->setGeometry(QRect(520, 420, 151, 31));
+        lblError->setGeometry(QRect(600, 30, 201, 61));
         btnCameraStop = new QPushButton(centralWidget);
         btnCameraStop->setObjectName(QStringLiteral("btnCameraStop"));
-        btnCameraStop->setGeometry(QRect(260, 400, 141, 41));
+        btnCameraStop->setGeometry(QRect(360, 400, 171, 81));
+        checkBox_StartCapturing = new QCheckBox(centralWidget);
+        checkBox_StartCapturing->setObjectName(QStringLiteral("checkBox_StartCapturing"));
+        checkBox_StartCapturing->setGeometry(QRect(600, 140, 161, 41));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 696, 21));
+        menuBar->setGeometry(QRect(0, 0, 849, 21));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -77,8 +82,9 @@ public:
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
         lblVideoSource->setText(QApplication::translate("MainWindow", "Video Source", 0));
         btnCameraStart->setText(QApplication::translate("MainWindow", "Start Camera", 0));
-        lblError->setText(QApplication::translate("MainWindow", "Error Box", 0));
+        lblError->setText(QApplication::translate("MainWindow", "FileStatus", 0));
         btnCameraStop->setText(QApplication::translate("MainWindow", "Stop Camera", 0));
+        checkBox_StartCapturing->setText(QApplication::translate("MainWindow", "Start Capturing", 0));
     } // retranslateUi
 
 };

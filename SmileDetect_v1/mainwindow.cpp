@@ -129,7 +129,7 @@ void MainWindow::timerEvent(QTimerEvent *event)
             {
                 /* For every face detected in each frame draw a rectangular bounding */
                 cv::rectangle( MatProcessedImage, faceBoundingVector[i], CV_RGB(0,0,0), 2 );
-                cv::Mat face = MatOriginalImage( faceBoundingVector[i] );
+                cv::Mat Matface = MatOriginalImage( faceBoundingVector[i] );
 
 
 
@@ -139,7 +139,7 @@ void MainWindow::timerEvent(QTimerEvent *event)
                 {
                     for(  r = faceBoundingVector.begin(); r != faceBoundingVector.end(); r++)
                     {
-                        HaarSmileClassifier.detectMultiScale(face, smileBoundingVector, 1.1, 0,
+                        HaarSmileClassifier.detectMultiScale(Matface, smileBoundingVector, 1.1, 0,
                                                              0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30));
 
 
@@ -153,7 +153,6 @@ void MainWindow::timerEvent(QTimerEvent *event)
                         if (min_neighbors == -1) min_neighbors = smile_neighbors;
                         max_neighbors = MAX(max_neighbors, smile_neighbors);
 
-                        // Draw rectangle on the left side of the image reflecting smile intensity
                         float intensityZeroOne = ((float)smile_neighbors - min_neighbors) / (max_neighbors - min_neighbors + 1);
 
                         if (intensityZeroOne > 0.0 && intensityZeroOne < 0.99)

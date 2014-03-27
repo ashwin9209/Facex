@@ -35,6 +35,8 @@ private:
     QImage qimgOriginal;
 
     QTimer *tmrTimer;
+
+    int ImageIndex;
 };
 
 #endif // MAINWINDOW_H
